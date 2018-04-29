@@ -1,0 +1,51 @@
+---
+title: "FIFA18"
+author: "Kesong Wu"
+date: "2018/4/29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+```
+
+##Introduction
+
+We will use the statistical information of football plyers inthe video game FIFA 18.
+
+#Load the data and Clean the data
+There are three tables we may use in this project.
+```{r load, echo=FALSE}
+ppd <- read.csv("PlayerPersonalData.csv", header = TRUE)
+# Player's Personal Data
+ppp <- read.csv("PlayerPlayingPositionData.csv", header = TRUE)
+# Player's Playing Position Data
+pad <- read.csv("PlayerAttributeData.csv", header = TRUE)
+# Player's Attribute Data
+```
+
+Let's have a glimpse on the data.
+```{r glimpse, echo=FALSE}
+glimpse(ppd)
+glimpse(ppp)
+glimpse(pad)
+```
+
+From the glimpse we can find that every table has useless columns and there is a column called "index" that can join the three tables together.
+```{r join, echo=FALSE}
+fifa <- ppd[,-c(1:2)] %>%
+  full_join(ppp[,-1], by = "ID") %>%
+  full_join(pad[,-1], by = "ID")
+
+kable(head(fifa))
+```
+
+##Ages of football players
+
+Let's have a look at the density of the ages of these football player.
+```{r ages, echo=FALSE}
+ggplot(fifa, aes(Age)) + geom_density()
+```
