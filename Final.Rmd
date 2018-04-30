@@ -69,7 +69,7 @@ fifa %>%
 
 We can see that the players are improving with the step of the years. The best players are 30 years old and after that they start to decline.
 
-##Best Players
+##Best Players & Clubs
 Based on the overall score, we will find which are the best ten players.
 ```{r bestplayer, echo=FALSE}
 fifa %>%
@@ -79,10 +79,49 @@ fifa %>%
 ```
 
 Then, let's have a look at each team's best player's overall, worst player's overall and the average overall.
-```{r teambestplayer, echo=FALSE}
-fifa %>%
+```{r teamplayer, echo=FALSE}
+TeamPower <- fifa %>%
   select(Name, Club, Overall) %>%
   group_by(Club) %>%
   summarise(Best = max(Overall), Worst = min(Overall), Ave = mean(Overall)) %>%
   arrange(desc(Ave))
+
+TeamPower
 ```
+
+We can see that the best three clubs are FC Barcelona, Juventus and Real Madrid CF.
+
+##Players who earned most and Clubs paid most
+```{r wage, echo=FALSE}
+fifa$Wage <- gsub("€", "", fifa$Wage)
+fifa$Wage <- gsub("K", "000", fifa$Wage)
+fifa$Wage <- as.numeric(fifa$Wage)
+
+fifa %>%
+  select(Name, Wage, Club) %>%
+  arrange(desc(Wage)) %>%
+  head(10)
+```
+
+We can see that, C.Ronaldo and Messi earned most.
+```{r teamwage, echo=FALSE}
+TeamWage <- fifa %>%
+  select(Name, Wage, Club) %>%
+  group_by(Club) %>%
+  summarise(TotalWage = sum(Wage)) %>%
+  arrange(desc(TotalWage))
+
+TeamWage
+```
+We can see that FC Barcelona, Real Madrid CF and Manchester United paid most.
+
+Let's combine this result with the best teams result we studied before.
+```{r pvw, echo=FALSE}
+TeamPower %>%
+  full_join(TeamWage, by = "Club") %>%
+  ggplot(aes(x = TotalWage, y = Ave)) + geom_point() + geom_smooth()
+```
+
+From this plot, we can easily see that, to be a better team, you have to pay more money.
+
+
