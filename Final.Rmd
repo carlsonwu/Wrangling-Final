@@ -208,7 +208,8 @@ position <- fifa %>%
   select(Name, Preferred.Positions) %>%
   separate(Preferred.Positions, into = c("P1", "P2", "P3", "P4"), sep = " ") 
 
-position
+position %>%
+  head(20)
 ```
 
 Then let's have a look at how many kinds of positions there are an count how many positions each player can play.
@@ -229,7 +230,8 @@ allposition <- as.data.frame(pplay)[,1]
 
 position %>%
   mutate(npos = P1 %in% allposition + P2 %in% allposition +P3 %in% allposition + P4 %in% allposition) %>%
-  arrange(desc(npos))
+  arrange(desc(npos)) %>%
+  head(20)
 # I think this part I can use "apply" funcion to make it more simple, but I tried many times and did not work
 ```
 We can see that most players prefer playing CB, CM and ST, fewest prefer LWB and RWB. Many players can play four positions.
@@ -237,7 +239,7 @@ We can see that most players prefer playing CB, CM and ST, fewest prefer LWB and
 That surprised me is that, 2024 players prefer GK(Goal Keeper).
 
 ```{r combine, echo=TRUE}
-position %>%
+combine <- position %>%
   select(P1:P4) %>%
   table()
 
