@@ -16,7 +16,7 @@ library(knitr)
 
 We will use the statistical information of football plyers inthe video game FIFA 18.
 
-#Load the data and Clean the data
+##Load the data and Clean the data
 There are three tables we may use in this project.
 ```{r load, echo=FALSE}
 ppd <- read.csv("PlayerPersonalData.csv", header = TRUE)
@@ -49,3 +49,23 @@ Let's have a look at the density of the ages of these football player.
 ```{r ages, echo=FALSE}
 ggplot(fifa, aes(Age)) + geom_density()
 ```
+
+From this plot we can see that most players are between 18 and 30.
+
+##Player's Overall
+
+Let's see how the overall scores of all the players are distribute.
+```{r overall, echo=FALSE}
+fifa %>%
+  ggplot(aes(x = Overall, fill = factor(Overall))) + geom_bar() + ggtitle("Player's Overall") + theme(plot.title = element_text(hjust = .5)) + guides(fill = FALSE)
+# Use guides(fill = FALSE) to avoid messing up the plot
+```
+
+Then let's see if overall scores are related to players' ages.
+```{r ova, echo=FALSE}
+fifa %>%
+  ggplot(aes(x = Age, y = Overall)) + geom_point() + geom_smooth(span = 1) 
+```
+
+We can see that the players are improving with the step of the years. The best players are 30 years old and after that they start to decline.
+
