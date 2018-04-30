@@ -69,3 +69,20 @@ fifa %>%
 
 We can see that the players are improving with the step of the years. The best players are 30 years old and after that they start to decline.
 
+##Best Players
+Based on the overall score, we will find which are the best ten players.
+```{r bestplayer, echo=FALSE}
+fifa %>%
+  arrange(desc(Overall)) %>%
+  select(Name, Overall, Club) %>%
+  head(10)
+```
+
+Then, let's have a look at each team's best player's overall, worst player's overall and the average overall.
+```{r teambestplayer, echo=FALSE}
+fifa %>%
+  select(Name, Club, Overall) %>%
+  group_by(Club) %>%
+  summarise(Best = max(Overall), Worst = min(Overall), Ave = mean(Overall)) %>%
+  arrange(desc(Ave))
+```
