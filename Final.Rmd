@@ -12,6 +12,7 @@ library(tidyr)
 library(knitr)
 library(rworldmap)
 library(tidyverse)
+library(corrplot)
 ```
 
 ##Introduction
@@ -102,7 +103,7 @@ We can see that the best three clubs are FC Barcelona, Juventus and Real Madrid 
 
 ##Players who earned most and Clubs paid most
 ```{r wage, echo=TRUE}
-fifa$Wage <- gsub("€", "", fifa$Wage)
+fifa$Wage <- gsub("???", "", fifa$Wage)
 fifa$Wage <- gsub("K", "e+03", fifa$Wage)
 fifa$Wage <- as.numeric(fifa$Wage)
 
@@ -111,7 +112,7 @@ fifa %>%
   arrange(desc(Wage)) %>%
   head(10)
 
-# I met a problem in this chunk, when I run it in R Markdown, it works, but when I knit this file and output the html file, these numbers will be missing.
+# p.s. I found an interesting here, when I open my file in my R project, I can get the right result in chunk, but when I knit this file, html cannot encode right and I will get all NAs. However, if I do not open it in my R project, it can get the right result both in chunk and html. I tried change my R project's encoding option, but it still didn't work. Why this happen?
 ```
 
 We can see that, C.Ronaldo and Messi earned most.
@@ -139,7 +140,7 @@ From this plot, we can easily see that, to be a better team, you have to pay mor
 
 We can see that many players might sign a cheap contract before, we now study there value. _We can use sciece notation here._
 ```{r playervalue, echo=FALSE}
-fifa$Value <- gsub("€", "",fifa$Value)
+fifa$Value <- gsub("???", "",fifa$Value)
 fifa$Value <- gsub("M", "e+06",fifa$Value)
 fifa$Value <- gsub("K", "e+03",fifa$Value)
 fifa$Value <- as.numeric(fifa$Value)
@@ -199,3 +200,59 @@ For there are many names that are not English letters, we will get many missing 
 
 From the result we can see that the most common last name in FIFA18 football players is _"Silva"_.
 
+##Player's Postion
+
+We can see many players prefer several positions, let's get the positions separated first.
+```{r postion, echo=FALSE}
+position <- fifa %>%
+  select(Name, Preferred.Positions) %>%
+  separate(Preferred.Positions, into = c("P1", "P2", "P3", "P4"), sep = " ") 
+
+position
+```
+
+Then let's have a look at how many kinds of positions there are an count how many positions each player can play.
+```{r numposition, echo=FALSE}
+pplay <- position %>%
+  select(P1:P4) %>%
+  as.matrix() %>%
+  as.vector() %>%
+  table()
+
+pplay <- pplay[-1]
+# delete the data saved as ""
+
+pplay
+
+allposition <- as.data.frame(pplay)[,1]
+# save all kinds of positions
+
+position %>%
+  mutate(npos = P1 %in% allposition + P2 %in% allposition +P3 %in% allposition + P4 %in% allposition) %>%
+  arrange(desc(npos))
+# I think this part I can use "apply" funcion to make it more simple, but I tried many times and did not work
+```
+We can see that most players prefer playing CB, CM and ST, fewest prefer LWB and RWB. Many players can play four positions.
+
+That surprised me is that, 2024 players prefer GK(Goal Keeper).
+
+```{r combine, echo=TRUE}
+position %>%
+  select(P1:P4) %>%
+  table()
+
+# p.s. Is there a better way to calculate which pair of positions appear together most times?
+```
+From the table we can see that the the postions player select together, though not exactly the same, have many characters in common. For example, CB(Center Back) and CM(Center Mid-fielder), nearly the same position.
+
+##Simple Analysis
+
+Then let's do some simple analysis based on the data.
+
+There may be some relations between player's value, wage, overall and potential.
+```{r cor, echo=FALSE}
+fifa %>%
+  select(Value, Wage, Overall, Potential) %>%
+  cor() %>%
+  corrplot()
+```
