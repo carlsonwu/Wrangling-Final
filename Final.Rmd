@@ -11,6 +11,7 @@ library(dplyr)
 library(tidyr)
 library(knitr)
 library(rworldmap)
+library(tidyverse)
 ```
 
 ##Introduction
@@ -30,8 +31,11 @@ pad <- read.csv("PlayerAttributeData.csv", header = TRUE)
 
 Let's have a glimpse on the data.
 ```{r glimpse, echo=FALSE}
+dim(ppd)
 glimpse(ppd)
+dim(ppp)
 glimpse(ppp)
+dim(pad)
 glimpse(pad)
 ```
 
@@ -40,6 +44,10 @@ From the glimpse we can find that every table has useless columns and there is a
 fifa <- ppd[,-c(1:2)] %>%
   full_join(ppp[,-1], by = "ID") %>%
   full_join(pad[,-1], by = "ID")
+
+dim(fifa)
+# From the dim, we can see that there may be some dupicate rows in our data
+fifa <- fifa[!duplicated(fifa$ID),]
 
 kable(head(fifa))
 ```
@@ -93,7 +101,7 @@ TeamPower
 We can see that the best three clubs are FC Barcelona, Juventus and Real Madrid CF.
 
 ##Players who earned most and Clubs paid most
-```{r wage, echo=FALSE}
+```{r wage, echo=TRUE}
 fifa$Wage <- gsub("€", "", fifa$Wage)
 fifa$Wage <- gsub("K", "e+03", fifa$Wage)
 fifa$Wage <- as.numeric(fifa$Wage)
@@ -102,6 +110,8 @@ fifa %>%
   select(Name, Wage, Club) %>%
   arrange(desc(Wage)) %>%
   head(10)
+
+# I met a problem in this chunk, when I run it in R Markdown, it works, but when I knit this file and output the html file, these numbers will be missing.
 ```
 
 We can see that, C.Ronaldo and Messi earned most.
@@ -127,7 +137,7 @@ From this plot, we can easily see that, to be a better team, you have to pay mor
 
 ##Players' Value
 
-We can see that many players might sign a cheap contract before, we now study there value. ^We can use sciece notation here.^
+We can see that many players might sign a cheap contract before, we now study there value. _We can use sciece notation here._
 ```{r playervalue, echo=FALSE}
 fifa$Value <- gsub("€", "",fifa$Value)
 fifa$Value <- gsub("M", "e+06",fifa$Value)
@@ -168,3 +178,24 @@ nation %>%
   head(10)
 ```
 These are the countries have most players.
+
+##Players' Last Name
+
+At this part, I just wanna practice the ^Regular Expression^, but in the data we have, Name is the only part we could use. However, many players' first names were not given, for example, "Leonardo Messi" is just given as "L.Messi", so I decided to extract these players' last name.
+```{r lastname, echo=FALSE}
+name <- fifa$Name
+LMEx <- "[A-Z]{1}[a-z]+$"
+LastName <- str_extract_all(name, LMEx, simplify = TRUE)
+
+LastName <- as.data.frame(LastName)
+colnames(LastName) <- c("name")
+LastName %>%
+  group_by(name) %>%
+  summarise(n = n())%>%
+  arrange(desc(n)) %>%
+  head(10)
+```
+For there are many names that are not English letters, we will get many missing values in this progress. 
+
+From the result we can see that the most common last name in FIFA18 football players is _"Silva"_.
+
