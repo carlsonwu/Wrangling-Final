@@ -113,9 +113,9 @@ fifa %>%
   arrange(desc(Wage)) %>%
   head(10)
 
-# p.s. I met a trouble here, when I open my file in my R project, I can get the right result in chunk, but when I knit this file, html cannot encode right and I will get all NAs. I tried change my R project's encoding option, but it still didn't work. What can I do?
+# p.s. I met a trouble here, when I open my file in my R project, I can get the right result in chunk, but when I knit this file, html cannot encode right and I will get all NAs. I tried change my R project's encoding option, but it still didn't work. 
 
-# There seems to be something wrong with the euro dollar symbol
+# There seems to be something wrong with the euro dollar symbol and my html edition, if I changed a laptop, it worked
 ```
 
 We can see that, C.Ronaldo and Messi earned most.
