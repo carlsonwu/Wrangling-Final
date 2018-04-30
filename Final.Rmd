@@ -10,6 +10,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(knitr)
+library(rworldmap)
 ```
 
 ##Introduction
@@ -144,3 +145,26 @@ Our table seems better now, and we can output a new csv file for future use.
 ```{r output, echo=TRUE}
 write.csv(fifa, file = "FIFA18.csv")
 ```
+
+##Nationalities of the Players
+
+Here we use a new package called "rWorldMap" to show the players' nationalitites in a world map.
+```{r worldmap, echo=FALSE}
+nation <- fifa %>%
+  group_by(Nationality) %>%
+  summarise(n = n())
+
+prepare <- joinCountryData2Map(dF = nation, joinCode = "NAME", nameJoinColumn = "Nationality", verbose = FALSE)
+
+mapCountryData(mapToPlot = prepare, nameColumnToPlot = "n", catMethod = "fixedWidth",
+               oceanCol = "steelblue1", missingCountryCol = "white", 
+               mapTitle = "Number of Players by Country", aspect = "variable")
+```
+
+We can see that China has no players in these clubs, European countries and South American countries have the most players.
+```{r nation, echo=FALSE}
+nation %>%
+  arrange(desc(n)) %>%
+  head(10)
+```
+These are the countries have most players.
